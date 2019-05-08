@@ -9,7 +9,6 @@ provider.setCustomParameters({
 });
 const auth = firebase.auth();
 const database = firebase.database();
-const timeZoneApiKey = "DSRH0427MEXW";
 const geocodingApiKey = "344359f0b0dd4952a69c54a2d8d0ceb4";
 
 class App extends Component {
