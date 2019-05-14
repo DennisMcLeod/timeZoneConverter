@@ -21,6 +21,8 @@ class App extends Component {
       user: null,
       currentTimeZone: "",
     };
+
+    this.getCurrentTimeZone = this.getCurrentTimeZone.bind(this)
   }
 
   // AUTHENTICATION & USER CREATION
@@ -64,8 +66,9 @@ class App extends Component {
   // PASSING INFO TO STATE
 
   getCurrentTimeZone(timeZone) {
+    console.log(timeZone)
     this.setState({
-      currentTimeZone: timeZone,
+      currentTimeZone: timeZone
     })
   }
 

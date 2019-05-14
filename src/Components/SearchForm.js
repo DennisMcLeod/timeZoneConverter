@@ -12,24 +12,13 @@ class SearchForm extends Component {
             country: ""
         }
     }
-    
-    handleCityChange = event => {
-        this.setState({
-            city: event.target.value
-        });
-    };
 
-    handleCountryChange = event => {
-        this.setState({
-            country: event.target.value
-        });
-    };
-
-    getCoordinatesByCity = async () => {
+    // Make API call to open cage data to get the latitude and longitude coordinates of the user selected city to be passed into the API call to get the time zone 
+    getCoordinatesByCity = async (city, country) => {
         const url = new URL("https://api.opencagedata.com/geocode/v1/json"),
             params = {
                 key: geocodingApiKey,
-                q: `${this.state.city}+${this.state.country}`
+                q: `${city}+${country}`
             };
 
         Object.keys(params).forEach(key => {
@@ -40,6 +29,7 @@ class SearchForm extends Component {
         return await res.json();
     };
 
+    // Use the coordinates from the previous API call to get the time zone of the user selected city
     getTimeZoneByCoordinates = async coordinates => {
         const url = new URL("http://api.timezonedb.com/v2.1/get-time-zone"),
             params = {
@@ -75,17 +65,29 @@ class SearchForm extends Component {
 
     handleSearchSubmit = e => {
         e.preventDefault();
-        this.getCoordinatesByCity()
-            .then(res => {
-                res = res.results;
-                return res[0].geometry;
-            })
-            .then(res => {
-                return this.getTimeZoneByCoordinates(res);
-            })
-            .then(res => {
-                this.props.getCurrentTimeZone(res.abbreviation);
-            });
+        console.log(e.target)
+        const city = e.target.elements.cityInput.value;
+        const country = e.target.elements.countryInput.value;
+
+        if (city) {
+            this.getCoordinatesByCity(city, country)
+                .then(res => {
+                    res = res.results;
+                    return res[0].geometry;
+                })
+                .then(res => {
+                    return this.getTimeZoneByCoordinates(res);
+                })
+                .then(res => {
+                    this.props.getCurrentTimeZone(res.abbreviation);
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            
+        } else {
+            console.log('please enter city')
+        }
     };
 
     render() {
@@ -97,13 +99,10 @@ class SearchForm extends Component {
                         id="cityInput"
                         placeholder="City"
                         name="cityInput"
-                        value={this.state.city}
-                        onChange={this.handleCityChange}
                     />
                     <select
                         name="countryInput"
                         id="countryInput"
-                        onChange={this.handleCountryChange}
                     >
                         <option value="Canada">Canada</option>
                         <option value="USA">USA</option>
